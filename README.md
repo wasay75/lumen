@@ -17,6 +17,23 @@ pulled apart; you turn each strand until the light runs through the whole weave.
 
 ## Play it now
 
+### **<https://wasay75.github.io/lumen/>**
+
+That one link installs on every platform, and once installed the game runs with
+no connection at all.
+
+| | how to install |
+|---|---|
+| **iPhone / iPad** | Open the link in **Safari** → **Share** → **Add to Home Screen**. Chrome on iOS cannot install web apps; it has to be Safari. |
+| **Android** | Open in **Chrome** → tap **Install** on the title screen, or **⋮ → Install app**. |
+| **Mac** | **Safari** → **File → Add to Dock**, or **Chrome/Edge** → **Install** on the title screen. |
+| **Windows** | **Chrome** or **Edge** → **Install** on the title screen, or the install icon in the address bar. It lands in the Start menu. |
+
+Installed, it gets its own icon and window, hides the browser chrome, and works
+on a plane. Progress lives on the device.
+
+### Locally, while developing
+
 ```bash
 python3 serve.py
 ```
@@ -26,7 +43,20 @@ your Mac's LAN address instead of `localhost` — the server already listens on 
 interfaces.
 
 There is also a single self-contained file at `dist/lumen.html` (one HTML file
-with everything inlined) — AirDrop it to a phone and it plays offline, no server.
+with everything inlined) — AirDrop it to a phone and it plays offline, no server,
+no install.
+
+### Redeploying
+
+The repo root *is* the deployed site, so a push updates the live game:
+
+```bash
+git add -A && git commit -m "..." && git push
+```
+
+`tools/package-www.py` stamps a fresh cache name into `www/sw.js` for the native
+build; the hosted `sw.js` revalidates in the background, so players pick up a new
+version on their next launch.
 
 ---
 
@@ -54,6 +84,8 @@ js/storage.js            progress and settings (localStorage, fails soft)
 js/audio.js              synthesised sound — no audio files to license
 js/engine.js             pure puzzle logic: generation, lighting, par, stars
 js/game.js               rendering, input, screen flow
+sw.js                    offline cache for the installed app
+js/install.js            install prompt + service-worker registration
 icons/                   app icons, generated
 tools/build.py           → dist/lumen.html   (one self-contained file)
 tools/package-www.py     → www/              (what Capacitor wraps)
