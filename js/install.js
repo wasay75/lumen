@@ -11,6 +11,10 @@
   var sheet = doc.getElementById('veil-install');
   if (!btn || !sheet) return;
 
+  // Inside the Capacitor shell the app is already installed: no install
+  // prompt, and no service worker (the shell serves the files itself).
+  if (root.Capacitor && root.Capacitor.isNativePlatform && root.Capacitor.isNativePlatform()) return;
+
   function standalone() {
     return (root.matchMedia && root.matchMedia('(display-mode: standalone)').matches) ||
            root.navigator.standalone === true;

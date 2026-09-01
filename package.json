@@ -1,0 +1,29 @@
+{
+  "name": "lumen",
+  "version": "1.0.0",
+  "description": "Lumen — a quiet puzzle of light. A calm connection puzzle.",
+  "scripts": {
+    "www": "python3 tools/package-www.py",
+    "sync": "python3 tools/package-www.py && cap sync",
+    "ios": "npm run sync && cap open ios",
+    "android": "npm run sync && cap open android",
+    "icons": "python3 tools/make-icons.py",
+    "build": "python3 tools/build.py"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wasay75/lumen.git"
+  },
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/wasay75/lumen/issues"
+  },
+  "homepage": "https://github.com/wasay75/lumen#readme",
+  "private": true,
+  "dependencies": {
+    "@capacitor/android": "^8.5.1",
+    "@capacitor/cli": "^8.5.1",
+    "@capacitor/core": "^8.5.1",
+    "@capacitor/ios": "^8.5.1"
+  }
+}
