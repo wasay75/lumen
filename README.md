@@ -85,11 +85,16 @@ js/audio.js              synthesised sound — no audio files to license
 js/engine.js             pure puzzle logic: generation, lighting, par, stars
 js/game.js               rendering, input, screen flow
 sw.js                    offline cache for the installed app
+android/                 native Android project (Capacitor)
+ios/                     native Xcode project (Capacitor)
 js/install.js            install prompt + service-worker registration
 icons/                   app icons, generated
 tools/build.py           → dist/lumen.html   (one self-contained file)
 tools/package-www.py     → www/              (what Capacitor wraps)
 tools/make-icons.py      → icons/*.png       (pure-stdlib PNG renderer)
+tools/make-native-assets.py  → launcher icons and splashes for both platforms
+tools/render.py          the mark, drawn to pixels; shared by both generators
+tools/env.sh             puts the local Node/JDK/Android toolchain on PATH
 serve.py                 local static server for play-testing
 capacitor.config.json    native shell configuration
 ```
@@ -108,37 +113,95 @@ Tuning knobs all live in `js/engine.js`: `shapeOf` (grid size per level),
 
 ---
 
-## Shipping to the App Store and Play Store
+## Building the native apps
 
-The game is a plain web app, so [Capacitor](https://capacitorjs.com) wraps it in
-a real native shell — a genuine `.ipa` and `.aab`, not a browser bookmark.
+The toolchain is already installed on this Mac, under your home folder — no
+Homebrew, nothing system-wide, no admin password was needed:
 
-**One-time setup** (needs Node, Xcode for iOS, Android Studio for Android):
+| | | |
+|---|---|---|
+| Node 24 LTS | `~/.local/node` | 52 MB |
+| Temurin JDK 21 | `~/.local/jdk21` | 185 MB |
+| Android SDK 36 | `~/Library/Android/sdk` | ~700 MB |
+| Capacitor 8 | `node_modules/` | — |
+
+Load it into a shell with:
 
 ```bash
-npm init -y && npm i @capacitor/core @capacitor/cli @capacitor/ios @capacitor/android
+source tools/env.sh
 ```
 
-**Every time you want to build:**
+### Android
 
 ```bash
-python3 tools/package-www.py && npx cap sync
+npm run sync && cd android && ./gradlew assembleDebug
 ```
 
-Then `npx cap open ios` or `npx cap open android` and build from Xcode / Android
-Studio as usual. `capacitor.config.json` is already filled in — change `appId`
-to a domain you control before you submit, since it cannot be changed later.
+The APK lands in `android/app/build/outputs/apk/debug/app-debug.apk`. To put it
+on a phone, either copy the file across and open it (Android will ask you to
+allow installs from that source), or with USB debugging on:
+
+```bash
+adb install -r android/app/build/outputs/apk/debug/app-debug.apk
+```
+
+**For Play Store you need a release build, which needs your own signing key.**
+Create it yourself so nobody else ever holds the password:
+
+```bash
+keytool -genkey -v -keystore lumen-release.jks -keyalg RSA -keysize 2048 -validity 10000 -alias lumen
+```
+
+Keep that file and its password safe and backed up — lose it and you can never
+update the app again. Then add a `signingConfigs` block to
+`android/app/build.gradle` pointing at it, and run `./gradlew bundleRelease` to
+get the `.aab` that Play Console wants.
+
+### iOS
+
+The Xcode project is generated and waiting at `ios/App/App.xcodeproj`. Capacitor
+8 uses Swift Package Manager, so there is no CocoaPods step.
+
+**It cannot be built on this Mac yet.** Only the Command Line Tools are
+installed, and `xcodebuild` needs the full Xcode:
+
+```
+xcode-select: error: tool 'xcodebuild' requires Xcode, but active developer
+directory '/Library/Developer/CommandLineTools' is a command line tools instance
+```
+
+Xcode is a ~10 GB App Store download that needs your Apple ID, so it has to be
+you who installs it. One thing to check first: this Mac runs **macOS 14.2**, and
+recent Xcode versions require a newer macOS than that — while the App Store
+requires apps to be built with a recent SDK. Update macOS first, then install
+Xcode, then:
+
+```bash
+npm run ios          # syncs the web build and opens Xcode
+```
+
+Set your team under **Signing & Capabilities** and press Run. Submitting to the
+App Store also needs a paid Apple Developer account ($99/year).
+
+### App artwork
+
+Every icon and splash screen is generated from the same mark the game draws:
+
+```bash
+python3 tools/make-native-assets.py
+```
+
+Re-run it after any `cap add`, which restores Capacitor's placeholder art.
 
 ### Before you submit
 
-- **`appId`** — reverse-domain, e.g. `com.yourname.lumen`. Permanent once live.
-- **Icons** — `icons/icon-1024.png` is the App Store artwork; run
-  `python3 tools/make-icons.py` after any change to the mark.
-- **Screenshots** — both stores want them at several device sizes. Capture from
-  the simulator with the Ivory and Midnight themes for variety.
-- **Privacy** — the game collects nothing, has no network calls, no analytics,
-  no accounts. Answer "no data collected" on both store forms; that is a real
-  competitive advantage in the puzzle category, so say it on the listing.
+- **`appId`** — currently `com.lumen.puzzle`. Change it to a domain you control
+  before you submit; it is permanent once the app is live.
+- **Screenshots** — both stores want them at several device sizes. Capture with
+  the Ivory and Midnight themes for variety.
+- **Privacy** — the game collects nothing, has no network calls, no analytics, no
+  accounts. Answer "no data collected" on both store forms; that is a real
+  competitive advantage in the puzzle category, so say it on the listing too.
 - **Age rating** — 4+ / Everyone.
 - **Android** — Play requires a signed `.aab` and a privacy policy URL even for
   apps that collect nothing.
