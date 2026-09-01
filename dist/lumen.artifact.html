@@ -1,0 +1,1152 @@
+<title>Lumen</title>
+<style>
+/* ============================================================
+   LUMEN — a quiet puzzle of light
+   ============================================================ */
+
+:root{
+  --serif: "Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,"Times New Roman",serif;
+  --sans: -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+
+  --ease: cubic-bezier(.22,.9,.28,1);
+  --turn: 300ms;
+
+  --ink:#f0ece3;
+  --ink-soft:#a8a294;
+  --ink-faint:#6d6a61;
+  --bg:#0a0b0e;
+  --bg-2:#11131a;
+  --surface:rgba(255,255,255,.032);
+  --surface-2:rgba(255,255,255,.055);
+  --hair:rgba(255,255,255,.09);
+  --hair-strong:rgba(255,255,255,.16);
+
+  --gold:#e8c27a;
+  --gold-hi:#fff0cf;
+  --gold-deep:#a97f38;
+  --wire:rgba(158,163,180,.30);
+
+  --glow-1:rgba(232,194,122,.55);
+  --glow-2:rgba(232,194,122,.18);
+
+  --shadow: 0 30px 80px -30px rgba(0,0,0,.9);
+}
+
+[data-skin="ivory"]{
+  --ink:#20201d;
+  --ink-soft:#6a675e;
+  --ink-faint:#9b978c;
+  --bg:#f6f2e9;
+  --bg-2:#efe9dc;
+  --surface:rgba(40,32,20,.028);
+  --surface-2:rgba(40,32,20,.05);
+  --hair:rgba(40,32,20,.11);
+  --hair-strong:rgba(40,32,20,.2);
+
+  --gold:#a3762a;
+  --gold-hi:#7d5717;
+  --gold-deep:#d9bd85;
+  --wire:rgba(60,55,45,.20);
+
+  --glow-1:rgba(163,118,42,.30);
+  --glow-2:rgba(163,118,42,.10);
+  --shadow: 0 30px 70px -34px rgba(70,55,30,.45);
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--sans);
+  -webkit-font-smoothing:antialiased;
+  overflow:hidden;
+  overscroll-behavior:none;
+  -webkit-tap-highlight-color:transparent;
+  -webkit-user-select:none; user-select:none;
+  touch-action:manipulation;
+}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:0}
+svg{display:block}
+
+/* ── ambient background ───────────────────────────────── */
+.aura{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.aura::after{
+  content:"";position:absolute;inset:-20%;
+  background:radial-gradient(120% 90% at 50% -10%, var(--bg-2) 0%, transparent 62%);
+}
+.aura span{
+  position:absolute;border-radius:50%;filter:blur(70px);opacity:.5;
+  background:radial-gradient(circle, var(--glow-2) 0%, transparent 70%);
+  animation:drift 26s var(--ease) infinite alternate;
+}
+.aura span:nth-child(1){width:60vmax;height:60vmax;top:-22vmax;left:-14vmax}
+.aura span:nth-child(2){width:46vmax;height:46vmax;bottom:-20vmax;right:-16vmax;animation-duration:34s;animation-delay:-8s}
+.aura span:nth-child(3){width:34vmax;height:34vmax;top:38%;left:56%;opacity:.28;animation-duration:42s;animation-delay:-16s}
+@keyframes drift{from{transform:translate3d(0,0,0) scale(1)}to{transform:translate3d(4vmax,-3vmax,0) scale(1.14)}}
+
+/* ── screens ──────────────────────────────────────────── */
+.screen{
+  position:fixed;inset:0;z-index:1;
+  display:none;flex-direction:column;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+.screen.is-active{display:flex;animation:fade .5s var(--ease) both}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+
+/* ── title ────────────────────────────────────────────── */
+.screen--title{align-items:center;justify-content:center;text-align:center}
+.title-wrap{padding:24px;max-width:420px;width:100%;animation:rise .8s var(--ease) both}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+.mark{width:96px;height:96px;margin:0 auto 26px}
+.mark svg{width:100%;height:100%;overflow:visible}
+.mark path{stroke:var(--wire);stroke-width:5;stroke-linecap:round;fill:none}
+.mark-o{fill:none;stroke:var(--gold);stroke-width:5;
+  stroke-dasharray:188;stroke-dashoffset:188;
+  animation:trace 3.4s var(--ease) .3s forwards, breathe 5s ease-in-out 3.7s infinite;
+  filter:drop-shadow(0 0 12px var(--glow-1))}
+.mark-c{fill:var(--gold);animation:breathe 5s ease-in-out infinite;filter:drop-shadow(0 0 10px var(--glow-1))}
+@keyframes trace{to{stroke-dashoffset:0}}
+@keyframes breathe{0%,100%{opacity:.85}50%{opacity:1}}
+
+.wordmark{
+  font-family:var(--serif);font-weight:400;
+  font-size:clamp(52px,17vw,74px);line-height:1;margin:0;
+  letter-spacing:.055em;text-indent:.055em;
+  background:linear-gradient(180deg,var(--ink) 12%,var(--gold) 130%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.tagline{
+  margin:14px 0 0;color:var(--ink-soft);
+  font-size:11.5px;letter-spacing:.42em;text-transform:uppercase;text-indent:.42em;
+}
+.rule{width:64px;height:1px;margin:28px auto;background:linear-gradient(90deg,transparent,var(--hair-strong),transparent)}
+
+.title-actions{display:flex;flex-direction:column;gap:12px;align-items:center}
+.title-meta{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint);margin-top:2px}
+.title-nav{margin-top:34px;display:flex;gap:12px;align-items:center;justify-content:center;color:var(--ink-faint)}
+.dot{opacity:.5}
+
+/* ── buttons ──────────────────────────────────────────── */
+.btn{
+  position:relative;min-width:210px;padding:15px 30px;border-radius:2px;
+  font-size:12.5px;letter-spacing:.24em;text-transform:uppercase;text-indent:.24em;
+  transition:transform .2s var(--ease), border-color .3s, background .3s, box-shadow .3s;
+}
+.btn--primary{
+  color:var(--gold-hi);
+  border:1px solid color-mix(in srgb, var(--gold) 45%, transparent);
+  background:linear-gradient(180deg, color-mix(in srgb,var(--gold) 13%,transparent), color-mix(in srgb,var(--gold) 5%,transparent));
+  box-shadow:0 0 0 0 var(--glow-2), inset 0 1px 0 color-mix(in srgb,var(--gold) 20%,transparent);
+}
+.btn--primary:hover{border-color:var(--gold);box-shadow:0 0 30px -6px var(--glow-1), inset 0 1px 0 color-mix(in srgb,var(--gold) 30%,transparent)}
+.btn--ghost{color:var(--ink-soft);border:1px solid var(--hair)}
+.btn--ghost:hover{color:var(--ink);border-color:var(--hair-strong)}
+.btn:active{transform:scale(.975)}
+
+.link{
+  color:var(--ink-faint);font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;
+  padding:8px 4px;transition:color .25s;
+}
+.link:hover{color:var(--gold)}
+
+/* ── HUD ──────────────────────────────────────────────── */
+.hud{
+  display:grid;grid-template-columns:44px 1fr 44px;align-items:center;
+  gap:10px;padding:14px 16px 6px;flex:0 0 auto;
+}
+.hud-center{text-align:center;min-width:0}
+.chapter{font-size:9.5px;letter-spacing:.3em;text-transform:uppercase;color:var(--ink-faint);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.level{font-family:var(--serif);font-size:19px;letter-spacing:.08em;margin-top:3px;color:var(--ink)}
+.hud-right{text-align:right}
+.moves{font-family:var(--serif);font-size:19px;color:var(--gold);line-height:1}
+.moves small{display:block;font-family:var(--sans);font-size:9.5px;letter-spacing:.14em;color:var(--ink-faint);margin-top:5px}
+
+.icon-btn{
+  width:38px;height:38px;display:grid;place-items:center;border-radius:50%;
+  border:1px solid transparent;transition:border-color .25s,background .25s;
+}
+.icon-btn:hover{border-color:var(--hair);background:var(--surface)}
+.icon-btn svg{width:19px;height:19px;fill:none;stroke:var(--ink-soft);stroke-width:1.5;stroke-linecap:round}
+
+/* ── board ────────────────────────────────────────────── */
+.stage{flex:1 1 auto;display:grid;place-items:center;min-height:0;padding:8px 14px}
+.board-frame{
+  position:relative;padding:16px;border-radius:6px;
+  border:1px solid var(--hair);
+  background:linear-gradient(180deg,var(--surface),transparent 70%);
+  box-shadow:var(--shadow);
+  animation:rise .6s var(--ease) both;
+}
+.board-frame::before,.board-frame::after{
+  content:"";position:absolute;width:11px;height:11px;border:1px solid var(--gold);opacity:.4;
+}
+.board-frame::before{top:-1px;left:-1px;border-right:0;border-bottom:0}
+.board-frame::after{bottom:-1px;right:-1px;border-left:0;border-top:0}
+
+.board{
+  display:grid;
+  grid-template-columns:repeat(var(--cols),var(--tile));
+  grid-auto-rows:var(--tile);
+  touch-action:none;
+}
+
+.tile{
+  width:var(--tile);height:var(--tile);
+  display:block;position:relative;
+  transform:rotate(var(--r,0deg));
+  transition:transform var(--turn) var(--ease);
+  will-change:transform;
+}
+.tile svg{width:100%;height:100%;overflow:visible}
+.tile .wire{
+  fill:none;stroke:var(--wire);stroke-width:11;stroke-linecap:round;stroke-linejoin:round;
+  transition:stroke .45s var(--ease);
+}
+.tile .node{fill:var(--wire);transition:fill .45s var(--ease)}
+
+.tile.is-lit .wire{stroke:var(--gold)}
+.tile.is-lit .node{fill:var(--gold-hi)}
+.tile.is-lit svg{filter:drop-shadow(0 0 5px var(--glow-1))}
+
+.tile.is-source .node{fill:var(--gold-hi)}
+.tile.is-source svg{filter:drop-shadow(0 0 10px var(--glow-1))}
+
+.tile.is-hint::after{
+  content:"";position:absolute;inset:9%;border-radius:4px;
+  border:1px solid var(--gold);opacity:0;
+  animation:pulse 1.15s var(--ease) 3;
+}
+@keyframes pulse{0%,100%{opacity:0;transform:scale(.9)}45%{opacity:.85;transform:scale(1)}}
+
+.board.is-solved .tile svg{filter:drop-shadow(0 0 12px var(--glow-1))}
+.board.is-solved .tile{animation:surge .9s var(--ease) both;animation-delay:calc(var(--d,0)*45ms)}
+@keyframes surge{
+  0%{filter:none}
+  35%{filter:brightness(1.9) saturate(1.15)}
+  100%{filter:none}
+}
+
+/* ── tray ─────────────────────────────────────────────── */
+.tray{
+  flex:0 0 auto;display:flex;justify-content:center;gap:10px;
+  padding:10px 16px calc(18px + env(safe-area-inset-bottom));
+}
+.tray-btn{
+  display:flex;align-items:center;gap:9px;padding:11px 20px;border-radius:2px;
+  border:1px solid var(--hair);color:var(--ink-soft);
+  font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;
+  transition:color .25s,border-color .25s,transform .2s var(--ease);
+}
+.tray-btn:hover{color:var(--ink);border-color:var(--hair-strong)}
+.tray-btn:active{transform:scale(.97)}
+.tray-btn:disabled{opacity:.35;pointer-events:none}
+.tray-btn svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+
+/* ── overlays ─────────────────────────────────────────── */
+.veil{
+  position:fixed;inset:0;z-index:10;display:grid;place-items:center;padding:24px;
+  background:color-mix(in srgb, var(--bg) 78%, transparent);
+  backdrop-filter:blur(14px) saturate(1.1);-webkit-backdrop-filter:blur(14px) saturate(1.1);
+  animation:fade .35s var(--ease) both;
+}
+.veil[hidden]{display:none}
+.card{
+  width:100%;max-width:352px;padding:36px 30px 30px;text-align:center;
+  border:1px solid var(--hair);border-radius:4px;
+  background:linear-gradient(180deg, var(--surface-2), var(--surface));
+  box-shadow:var(--shadow);
+  animation:rise .45s var(--ease) both;
+}
+.card h2{
+  font-family:var(--serif);font-weight:400;font-size:27px;letter-spacing:.06em;
+  margin:0 0 22px;
+}
+.card .btn{width:100%;min-width:0;margin-top:6px}
+.card .link{display:block;width:100%;margin-top:14px}
+
+.flourish{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:16px}
+.flourish i{height:1px;width:52px;background:linear-gradient(90deg,transparent,var(--hair-strong),transparent)}
+.flourish svg{width:15px;height:15px;fill:var(--gold);filter:drop-shadow(0 0 8px var(--glow-1))}
+
+.stars{display:flex;justify-content:center;gap:12px;margin:-6px 0 22px}
+.stars svg{width:26px;height:26px;fill:none;stroke:var(--hair-strong);stroke-width:1.4;stroke-linejoin:round}
+.stars .on svg{fill:var(--gold);stroke:var(--gold);filter:drop-shadow(0 0 9px var(--glow-1))}
+.stars span{animation:pop .5s var(--ease) both}
+.stars span:nth-child(2){animation-delay:.12s}
+.stars span:nth-child(3){animation-delay:.24s}
+@keyframes pop{from{opacity:0;transform:scale(.5) rotate(-14deg)}to{opacity:1;transform:none}}
+
+.score{display:flex;justify-content:center;gap:0;margin:0 0 26px;padding:16px 0;
+  border-top:1px solid var(--hair);border-bottom:1px solid var(--hair)}
+.score div{flex:1;padding:0 6px}
+.score div+div{border-left:1px solid var(--hair)}
+.score dt{font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-faint)}
+.score dd{margin:7px 0 0;font-family:var(--serif);font-size:21px;color:var(--gold)}
+
+.menu-list{display:flex;flex-direction:column;gap:10px}
+.menu-list .btn{margin-top:0}
+
+/* ── settings ─────────────────────────────────────────── */
+.settings{margin-bottom:24px}
+.row{
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
+  padding:15px 2px;border-top:1px solid var(--hair);
+  font-size:13px;letter-spacing:.04em;color:var(--ink-soft);text-align:left;cursor:pointer;
+}
+.row:last-child{border-bottom:1px solid var(--hair)}
+
+.seg{display:flex;border:1px solid var(--hair);border-radius:2px;overflow:hidden}
+.seg button{
+  padding:7px 13px;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint);
+  transition:color .25s,background .25s;
+}
+.seg button.is-on{color:var(--gold);background:color-mix(in srgb,var(--gold) 11%,transparent)}
+
+.switch{
+  appearance:none;-webkit-appearance:none;position:relative;
+  width:42px;height:23px;border-radius:12px;border:1px solid var(--hair-strong);
+  background:transparent;cursor:pointer;transition:border-color .3s,background .3s;flex:0 0 auto;
+}
+.switch::after{
+  content:"";position:absolute;top:3px;left:3px;width:15px;height:15px;border-radius:50%;
+  background:var(--ink-faint);transition:transform .3s var(--ease),background .3s;
+}
+.switch:checked{border-color:var(--gold);background:color-mix(in srgb,var(--gold) 13%,transparent)}
+.switch:checked::after{transform:translateX(19px);background:var(--gold)}
+
+/* ── how to play ──────────────────────────────────────── */
+.how{margin:0 0 18px;padding:0;list-style:none;text-align:left;counter-reset:s}
+.how li{
+  position:relative;padding:0 0 18px 34px;counter-increment:s;
+  font-size:13.5px;line-height:1.6;color:var(--ink-soft);
+}
+.how li::before{
+  content:counter(s,upper-roman);position:absolute;left:0;top:1px;
+  font-family:var(--serif);font-size:13px;color:var(--gold);letter-spacing:.05em;
+}
+.how b{color:var(--ink);font-weight:500}
+.fineprint{font-size:11.5px;color:var(--ink-faint);margin:0 0 22px;line-height:1.5}
+
+/* ── motion preferences ───────────────────────────────── */
+[data-motion="reduced"] *{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.05ms !important}
+@media (prefers-reduced-motion:reduce){
+  .aura span{animation:none}
+}
+@media (min-width:900px){
+  .card{max-width:380px}
+}
+
+</style>
+<div class="aura" aria-hidden="true"><span></span><span></span><span></span></div>
+
+<!-- ══════════ TITLE ══════════ -->
+<section class="screen screen--title is-active" id="screen-title">
+  <div class="title-wrap">
+    <div class="mark" aria-hidden="true">
+      <svg viewBox="0 0 120 120">
+        <g class="mark-g">
+          <path d="M60 60 L60 8"/><path d="M60 60 L112 60"/><path d="M60 60 L60 112"/><path d="M60 60 L8 60"/>
+        </g>
+        <circle class="mark-o" cx="60" cy="60" r="30"/>
+        <circle class="mark-c" cx="60" cy="60" r="7"/>
+      </svg>
+    </div>
+    <h1 class="wordmark">Lumen</h1>
+    <p class="tagline">A quiet puzzle of light</p>
+    <div class="rule" aria-hidden="true"></div>
+
+    <div class="title-actions">
+      <button class="btn btn--primary" id="btn-play"><span id="play-label">Begin</span></button>
+      <button class="btn btn--ghost" id="btn-newgame" hidden>Start over</button>
+      <div class="title-meta" id="title-meta" hidden></div>
+    </div>
+
+    <nav class="title-nav">
+      <button class="link" id="btn-install" hidden>Install</button>
+      <span class="dot" id="dot-install" hidden aria-hidden="true">·</span>
+      <button class="link" id="btn-how">How to play</button>
+      <span class="dot" aria-hidden="true">·</span>
+      <button class="link" id="btn-settings">Settings</button>
+    </nav>
+  </div>
+</section>
+
+<!-- ══════════ GAME ══════════ -->
+<section class="screen screen--game" id="screen-game">
+  <header class="hud">
+    <button class="icon-btn" id="btn-home" aria-label="Menu">
+      <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+    <div class="hud-center">
+      <div class="chapter" id="hud-chapter">Chapter I · First Light</div>
+      <div class="level" id="hud-level">Level 1</div>
+    </div>
+    <div class="hud-right">
+      <div class="moves"><span id="hud-moves">0</span><small id="hud-par">/ 0</small></div>
+    </div>
+  </header>
+
+  <main class="stage">
+    <div class="board-frame" id="board-frame">
+      <div class="board" id="board" role="application" aria-label="Puzzle board"></div>
+    </div>
+  </main>
+
+  <footer class="tray">
+    <button class="tray-btn" id="btn-restart">
+      <svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg>
+      <span>Reset</span>
+    </button>
+    <button class="tray-btn" id="btn-hint">
+      <svg viewBox="0 0 24 24"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.6.5.9 1.1 1 1.7l.1.5h5l.1-.5c.1-.6.4-1.2 1-1.7A6 6 0 0 0 12 3z"/></svg>
+      <span id="hint-label">Hint</span>
+    </button>
+  </footer>
+</section>
+
+<!-- ══════════ LEVEL COMPLETE ══════════ -->
+<div class="veil" id="veil-win" hidden>
+  <div class="card card--win">
+    <div class="flourish" aria-hidden="true"><i></i><svg viewBox="0 0 24 24"><path d="M12 2l2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4z"/></svg><i></i></div>
+    <h2 id="win-title">Complete</h2>
+    <div class="stars" id="win-stars" aria-hidden="true"></div>
+    <dl class="score">
+      <div><dt>Moves</dt><dd id="win-moves">—</dd></div>
+      <div><dt>Par</dt><dd id="win-par">—</dd></div>
+      <div><dt>Best</dt><dd id="win-best">—</dd></div>
+    </dl>
+    <button class="btn btn--primary" id="btn-next">Continue</button>
+    <button class="link" id="btn-replay">Play again</button>
+  </div>
+</div>
+
+<!-- ══════════ MENU ══════════ -->
+<div class="veil" id="veil-menu" hidden>
+  <div class="card">
+    <h2>Paused</h2>
+    <div class="menu-list">
+      <button class="btn btn--primary" id="btn-resume">Resume</button>
+      <button class="btn btn--ghost" id="btn-menu-restart">Restart level</button>
+      <button class="btn btn--ghost" id="btn-menu-settings">Settings</button>
+      <button class="btn btn--ghost" id="btn-menu-home">Main menu</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ SETTINGS ══════════ -->
+<div class="veil" id="veil-settings" hidden>
+  <div class="card">
+    <h2>Settings</h2>
+    <div class="settings">
+      <div class="row">
+        <span>Theme</span>
+        <div class="seg" id="seg-theme">
+          <button data-theme="midnight" class="is-on">Midnight</button>
+          <button data-theme="ivory">Ivory</button>
+        </div>
+      </div>
+      <label class="row"><span>Sound</span><input type="checkbox" id="set-sound" class="switch"></label>
+      <label class="row"><span>Haptics</span><input type="checkbox" id="set-haptics" class="switch"></label>
+      <label class="row"><span>Reduced motion</span><input type="checkbox" id="set-motion" class="switch"></label>
+    </div>
+    <button class="btn btn--primary" id="btn-settings-close">Done</button>
+  </div>
+</div>
+
+<!-- ══════════ INSTALL ══════════ -->
+<div class="veil" id="veil-install" hidden>
+  <div class="card card--how">
+    <h2>Add to your device</h2>
+    <ol class="how" id="install-ios" hidden>
+      <li>Tap <b>Share</b> in the Safari toolbar.</li>
+      <li>Choose <b>Add to Home Screen</b>.</li>
+      <li>Open Lumen from your home screen — it runs full screen and works offline.</li>
+    </ol>
+    <ol class="how" id="install-desktop" hidden>
+      <li>Open the <b>browser menu</b>.</li>
+      <li>Choose <b>Install Lumen</b> — in Safari on a Mac it is <b>Add to Dock</b>.</li>
+      <li>Lumen gets its own window and icon, and works offline.</li>
+    </ol>
+    <button class="btn btn--primary" id="btn-install-close">Done</button>
+  </div>
+</div>
+
+<!-- ══════════ HOW TO PLAY ══════════ -->
+<div class="veil" id="veil-how" hidden>
+  <div class="card card--how">
+    <h2>How to play</h2>
+    <ol class="how">
+      <li><b>Tap a strand</b> to turn it a quarter turn.</li>
+      <li><b>Join every end.</b> No strand may point at a wall or at nothing.</li>
+      <li><b>Light flows</b> from the source outward. The puzzle opens when the whole weave glows.</li>
+    </ol>
+    <p class="fineprint">On a mouse, right-click to turn a strand the other way.</p>
+    <button class="btn btn--primary" id="btn-how-close">Understood</button>
+  </div>
+</div>
+
+<script>
+/* ---- js/storage.js ---- */
+/* Lumen — persistence. Namespaced, versioned, and safe on locked-down browsers. */
+(function (root) {
+  'use strict';
+
+  var KEY = 'lumen.save.v1';
+
+  var DEFAULTS = {
+    level: 1,          // furthest level unlocked
+    best: {},          // { levelNumber: moves }
+    stars: {},         // { levelNumber: 1..3 }
+    started: false,
+    settings: {
+      theme: 'midnight',
+      sound: true,
+      haptics: true,
+      reducedMotion: false
+    }
+  };
+
+  function clone(o) { return JSON.parse(JSON.stringify(o)); }
+
+  var state = clone(DEFAULTS);
+
+  function load() {
+    try {
+      var raw = localStorage.getItem(KEY);
+      if (!raw) return;
+      var saved = JSON.parse(raw);
+      if (!saved || typeof saved !== 'object') return;
+      state = Object.assign(clone(DEFAULTS), saved);
+      state.settings = Object.assign(clone(DEFAULTS.settings), saved.settings || {});
+      state.best = saved.best || {};
+      state.stars = saved.stars || {};
+    } catch (e) { /* private mode, blocked storage — play unsaved */ }
+  }
+
+  var pending = null;
+  function save() {
+    if (pending) return;
+    pending = setTimeout(function () {
+      pending = null;
+      try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+    }, 120);
+  }
+
+  function reset() {
+    state = clone(DEFAULTS);
+    try { localStorage.removeItem(KEY); } catch (e) {}
+  }
+
+  load();
+
+  root.Store = {
+    get state() { return state; },
+    save: save,
+    reset: reset,
+    recordWin: function (level, moves, stars) {
+      var prev = state.best[level];
+      if (prev === undefined || moves < prev) state.best[level] = moves;
+      var ps = state.stars[level] || 0;
+      if (stars > ps) state.stars[level] = stars;
+      if (level + 1 > state.level) state.level = level + 1;
+      save();
+    }
+  };
+})(window);
+
+/* ---- js/audio.js ---- */
+/* Lumen — synthesised sound. No audio files: everything is generated, so the
+   bundle stays tiny and there is nothing to license for the stores. */
+(function (root) {
+  'use strict';
+
+  var ctx = null, bus = null, enabled = true;
+
+  function ensure() {
+    if (ctx) { if (ctx.state === 'suspended') ctx.resume(); return ctx; }
+    var AC = root.AudioContext || root.webkitAudioContext;
+    if (!AC) return null;
+    ctx = new AC();
+    bus = ctx.createGain();
+    bus.gain.value = 0.16;
+    bus.connect(ctx.destination);
+    return ctx;
+  }
+
+  function tone(freq, dur, type, vol, delay, glideTo) {
+    if (!enabled) return;
+    var c = ensure(); if (!c) return;
+    var t0 = c.currentTime + (delay || 0);
+    var osc = c.createOscillator();
+    var g = c.createGain();
+    var lp = c.createBiquadFilter();
+    lp.type = 'lowpass';
+    lp.frequency.value = 2400;
+
+    osc.type = type || 'sine';
+    osc.frequency.setValueAtTime(freq, t0);
+    if (glideTo) osc.frequency.exponentialRampToValueAtTime(glideTo, t0 + dur);
+
+    var peak = vol === undefined ? 0.5 : vol;
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(peak, t0 + 0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+
+    osc.connect(lp); lp.connect(g); g.connect(bus);
+    osc.start(t0); osc.stop(t0 + dur + 0.05);
+  }
+
+  root.Sound = {
+    unlock: function () { ensure(); },
+    set enabled(v) { enabled = !!v; },
+    get enabled() { return enabled; },
+
+    turn:   function () { tone(392, 0.10, 'sine', 0.30, 0, 466); },
+    connect:function () { tone(659.25, 0.16, 'triangle', 0.22); },
+    hint:   function () { tone(523.25, 0.14, 'sine', 0.25); tone(784, 0.20, 'sine', 0.16, 0.09); },
+    press:  function () { tone(294, 0.08, 'sine', 0.22); },
+    win: function () {
+      // A major, rising, with an octave bloom on top
+      [440, 554.37, 659.25, 880].forEach(function (f, i) {
+        tone(f, 0.9 - i * 0.08, 'triangle', 0.26, i * 0.10);
+      });
+      tone(1318.5, 1.5, 'sine', 0.10, 0.42);
+    }
+  };
+})(window);
+
+/* ---- js/engine.js ---- */
+/* Lumen — puzzle engine.
+   Pure logic, no DOM. Every level is generated from a seed derived from its
+   number, so level 42 is the same puzzle on every device, forever. */
+(function (root) {
+  'use strict';
+
+  // 0 = North, 1 = East, 2 = South, 3 = West
+  var DR = [-1, 0, 1, 0];
+  var DC = [0, 1, 0, -1];
+
+  function rotate(mask, r) {
+    r = ((r % 4) + 4) % 4;
+    return ((mask << r) | (mask >> (4 - r))) & 15;
+  }
+
+  /* deterministic PRNG (mulberry32) */
+  function rng(seed) {
+    var a = seed >>> 0;
+    return function () {
+      a = (a + 0x6D2B79F5) >>> 0;
+      var t = a;
+      t = Math.imul(t ^ (t >>> 15), 1 | t);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  var CHAPTERS = [
+    { from: 1,  name: 'First Light' },
+    { from: 7,  name: 'Still Water' },
+    { from: 15, name: 'The Gilded Path' },
+    { from: 25, name: 'Deep Ember' },
+    { from: 39, name: 'The Infinite Loom' }
+  ];
+  var ROMAN = ['I', 'II', 'III', 'IV', 'V'];
+
+  function chapterOf(level) {
+    var i = 0;
+    for (var k = 0; k < CHAPTERS.length; k++) if (level >= CHAPTERS[k].from) i = k;
+    return { index: i, numeral: ROMAN[i], name: CHAPTERS[i].name };
+  }
+
+  /* Board dimensions grow gently, and stay portrait-friendly. */
+  function shapeOf(level) {
+    var steps = [
+      [1,  3, 3], [4,  4, 4], [8,  4, 5], [12, 5, 5], [16, 5, 6],
+      [21, 6, 6], [27, 6, 7], [34, 7, 7], [42, 7, 8], [52, 8, 8]
+    ];
+    var s = steps[0];
+    for (var i = 0; i < steps.length; i++) if (level >= steps[i][0]) s = steps[i];
+    return { cols: s[1], rows: s[2] };
+  }
+
+  /* Chance of an extra edge, which turns the tree into a weave with loops.
+     Loops read as more ornamental and are meaningfully harder. */
+  function loopinessOf(level) {
+    if (level < 10) return 0;
+    return Math.min(0.14, (level - 9) * 0.012);
+  }
+
+  function build(level) {
+    var shape = shapeOf(level);
+    var rows = shape.rows, cols = shape.cols, n = rows * cols;
+    var rand = rng(level * 2654435761 + 0x9E37);
+    var masks = new Uint8Array(n);
+
+    // 1. Randomised depth-first spanning tree — long, sinuous corridors.
+    var seen = new Uint8Array(n);
+    var root0 = (rand() * n) | 0;
+    var stack = [root0];
+    seen[root0] = 1;
+
+    while (stack.length) {
+      var cur = stack[stack.length - 1];
+      var r = (cur / cols) | 0, c = cur % cols;
+      var opts = [];
+      for (var d = 0; d < 4; d++) {
+        var nr = r + DR[d], nc = c + DC[d];
+        if (nr < 0 || nc < 0 || nr >= rows || nc >= cols) continue;
+        var ni = nr * cols + nc;
+        if (seen[ni]) continue;
+        opts.push([d, ni]);
+      }
+      if (!opts.length) { stack.pop(); continue; }
+      var pick = opts[(rand() * opts.length) | 0];
+      masks[cur] |= 1 << pick[0];
+      masks[pick[1]] |= 1 << ((pick[0] + 2) % 4);
+      seen[pick[1]] = 1;
+      stack.push(pick[1]);
+    }
+
+    // 2. Sprinkle extra edges to create loops.
+    var loopiness = loopinessOf(level);
+    if (loopiness > 0) {
+      for (var i = 0; i < n; i++) {
+        var ri = (i / cols) | 0, ci = i % cols;
+        for (var dd = 1; dd <= 2; dd++) {           // East and South only, no double-counting
+          var r2 = ri + DR[dd], c2 = ci + DC[dd];
+          if (r2 >= rows || c2 >= cols) continue;
+          var j = r2 * cols + c2;
+          if (masks[i] & (1 << dd)) continue;
+          if (rand() >= loopiness) continue;
+          masks[i] |= 1 << dd;
+          masks[j] |= 1 << ((dd + 2) % 4);
+        }
+      }
+    }
+
+    // 3. Scramble. Guarantee the board does not open already solved.
+    var rots = new Int16Array(n);
+    var moved = false;
+    for (var k = 0; k < n; k++) {
+      var turns = (rand() * 4) | 0;
+      rots[k] = turns;
+      if (turns && rotate(masks[k], turns) !== masks[k]) moved = true;
+    }
+    if (!moved) {
+      for (var m = 0; m < n; m++) {
+        if (rotate(masks[m], 1) !== masks[m]) { rots[m] = 1; break; }
+      }
+    }
+
+    return {
+      level: level, rows: rows, cols: cols, root: root0,
+      masks: masks, rots: rots,
+      start: Int16Array.from(rots),                 // for Reset
+      par: par(masks, rots),
+      dist: distances(rows, cols, masks, root0)     // solved-state ripple order
+    };
+  }
+
+  /* Par is the tap-only cost: a tap turns a strand clockwise, so par counts
+     clockwise quarter-turns, honouring each piece's own symmetry (a straight
+     strand needs at most one turn, a cross needs none). Reverse-turning with
+     a right-click can only ever beat par, never be required to meet it. */
+  function par(masks, rots) {
+    var total = 0;
+    for (var i = 0; i < masks.length; i++) {
+      var current = rotate(masks[i], rots[i]);
+      for (var k = 1; k < 4; k++) {
+        if (rotate(current, k) === masks[i]) { total += k; break; }
+      }
+    }
+    return total;
+  }
+
+  /* Distance from the source through the *solved* weave — drives the
+     light-sweep animation on victory. */
+  function distances(rows, cols, masks, root0) {
+    var n = rows * cols;
+    var dist = new Int16Array(n).fill(-1);
+    var q = [root0], head = 0;
+    dist[root0] = 0;
+    while (head < q.length) {
+      var cur = q[head++];
+      var r = (cur / cols) | 0, c = cur % cols;
+      for (var d = 0; d < 4; d++) {
+        if (!(masks[cur] & (1 << d))) continue;
+        var nr = r + DR[d], nc = c + DC[d];
+        if (nr < 0 || nc < 0 || nr >= rows || nc >= cols) continue;
+        var ni = nr * cols + nc;
+        if (dist[ni] !== -1) continue;
+        dist[ni] = dist[cur] + 1;
+        q.push(ni);
+      }
+    }
+    return dist;
+  }
+
+  /* Which tiles carry light, and is the weave whole?
+     Solved means: no strand points at a wall or at a bare edge, AND every
+     tile is fed from the source. */
+  function evaluate(g) {
+    var rows = g.rows, cols = g.cols, n = rows * cols;
+    var eff = new Uint8Array(n);
+    for (var i = 0; i < n; i++) eff[i] = rotate(g.masks[i], g.rots[i]);
+
+    var sealed = true;
+    for (var a = 0; a < n; a++) {
+      var r = (a / cols) | 0, c = a % cols;
+      for (var d = 0; d < 4; d++) {
+        if (!(eff[a] & (1 << d))) continue;
+        var nr = r + DR[d], nc = c + DC[d];
+        if (nr < 0 || nc < 0 || nr >= rows || nc >= cols) { sealed = false; continue; }
+        if (!(eff[nr * cols + nc] & (1 << ((d + 2) % 4)))) sealed = false;
+      }
+    }
+
+    var lit = new Uint8Array(n);
+    var q = [g.root], head = 0;
+    lit[g.root] = 1;
+    var litCount = 1;
+    while (head < q.length) {
+      var cur = q[head++];
+      var cr = (cur / cols) | 0, cc = cur % cols;
+      for (var e = 0; e < 4; e++) {
+        if (!(eff[cur] & (1 << e))) continue;
+        var mr = cr + DR[e], mc = cc + DC[e];
+        if (mr < 0 || mc < 0 || mr >= rows || mc >= cols) continue;
+        var mi = mr * cols + mc;
+        if (lit[mi]) continue;
+        if (!(eff[mi] & (1 << ((e + 2) % 4)))) continue;
+        lit[mi] = 1; litCount++; q.push(mi);
+      }
+    }
+
+    return { lit: lit, litCount: litCount, solved: sealed && litCount === n };
+  }
+
+  /* A tile that is not yet in a solved orientation — used by Hint. */
+  function findUnsolved(g, rand) {
+    var wrong = [];
+    for (var i = 0; i < g.masks.length; i++) {
+      if (rotate(g.masks[i], g.rots[i]) !== g.masks[i]) wrong.push(i);
+    }
+    if (!wrong.length) return -1;
+    return wrong[((rand ? rand() : Math.random()) * wrong.length) | 0];
+  }
+
+  function turnsToSolve(g, i) {
+    for (var k = 1; k <= 4; k++) {
+      if (rotate(g.masks[i], g.rots[i] + k) === g.masks[i]) return k;
+    }
+    return 0;
+  }
+
+  function starsFor(moves, par, usedHint) {
+    if (usedHint) return moves <= Math.ceil(par * 1.35) ? 2 : 1;
+    if (moves <= par) return 3;
+    if (moves <= Math.ceil(par * 1.35)) return 2;
+    return 1;
+  }
+
+  root.Engine = {
+    DR: DR, DC: DC,
+    rotate: rotate,
+    build: build,
+    evaluate: evaluate,
+    chapterOf: chapterOf,
+    findUnsolved: findUnsolved,
+    turnsToSolve: turnsToSolve,
+    starsFor: starsFor
+  };
+})(window);
+
+/* ---- js/game.js ---- */
+/* Lumen — presentation, input and flow. */
+(function (root, doc) {
+  'use strict';
+
+  var E = root.Engine, Store = root.Store, Sound = root.Sound;
+  var S = Store.state;
+
+  var $ = function (id) { return doc.getElementById(id); };
+
+  var board = $('board'), stage = doc.querySelector('.stage');
+  var tiles = [];        // DOM nodes, index-aligned with the grid
+  var game = null;       // current puzzle
+  var moves = 0, usedHint = 0, locked = false, litPrev = null;
+
+  var STAR = '<svg viewBox="0 0 24 24"><path d="M12 2.6l2.7 6.1 6.6.6-5 4.4 1.5 6.5L12 16.8 6.2 20.2l1.5-6.5-5-4.4 6.6-.6z"/></svg>';
+
+  /* ── settings ───────────────────────────────────────── */
+  function applySettings() {
+    doc.documentElement.dataset.skin = S.settings.theme;
+    doc.documentElement.dataset.motion = S.settings.reducedMotion ? 'reduced' : 'full';
+    Sound.enabled = S.settings.sound;
+    var meta = doc.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', S.settings.theme === 'ivory' ? '#f6f2e9' : '#0a0b0e');
+    $('set-sound').checked = S.settings.sound;
+    $('set-haptics').checked = S.settings.haptics;
+    $('set-motion').checked = S.settings.reducedMotion;
+    Array.prototype.forEach.call($('seg-theme').children, function (b) {
+      b.classList.toggle('is-on', b.dataset.theme === S.settings.theme);
+    });
+  }
+
+  function buzz(ms) {
+    if (!S.settings.haptics) return;
+    if (navigator.vibrate) { try { navigator.vibrate(ms); } catch (e) {} }
+  }
+
+  /* ── screens & overlays ─────────────────────────────── */
+  function show(id) {
+    ['screen-title', 'screen-game'].forEach(function (s) {
+      $(s).classList.toggle('is-active', s === id);
+    });
+  }
+  function veil(id, on) { $(id).hidden = !on; }
+
+  /* ── tile artwork ───────────────────────────────────── */
+  var ARM = ['M50 50 L50 0', 'M50 50 L100 50', 'M50 50 L50 100', 'M50 50 L0 50'];
+
+  function tileSVG(mask) {
+    var d = '', arms = 0;
+    for (var k = 0; k < 4; k++) {
+      if (mask & (1 << k)) { d += ARM[k] + ' '; arms++; }
+    }
+    // A lone strand ends in a node — the terminals of the circuit.
+    var cap = arms === 1 ? '<circle class="node" cx="50" cy="50" r="13"/>' : '';
+    return '<svg viewBox="0 0 100 100">' + cap + '<path class="wire" d="' + d.trim() + '"/></svg>';
+  }
+
+  /* ── layout ─────────────────────────────────────────── */
+  function layout() {
+    if (!game) return;
+    var chrome = 36;                       // frame padding + hairline border
+    var w = stage.clientWidth - 28 - chrome;
+    var h = stage.clientHeight - 16 - chrome;
+    var size = Math.floor(Math.min(w / game.cols, h / game.rows));
+    size = Math.max(30, Math.min(118, size));   // small grids still fill a phone
+    board.style.setProperty('--tile', size + 'px');
+    board.style.setProperty('--cols', game.cols);
+  }
+
+  /* ── rendering ──────────────────────────────────────── */
+  function render() {
+    board.innerHTML = '';
+    board.classList.remove('is-solved');
+    tiles = [];
+    var frag = doc.createDocumentFragment();
+
+    for (var i = 0; i < game.masks.length; i++) {
+      var t = doc.createElement('button');
+      t.className = 'tile';
+      t.type = 'button';
+      t.dataset.i = i;
+      t.style.setProperty('--r', (game.rots[i] * 90) + 'deg');
+      t.style.setProperty('--d', Math.max(0, game.dist[i]));
+      t.setAttribute('aria-label', 'Turn strand');
+      t.innerHTML = tileSVG(game.masks[i]);
+      if (i === game.root) t.classList.add('is-source');
+      tiles.push(t);
+      frag.appendChild(t);
+    }
+    board.appendChild(frag);
+    layout();
+    litPrev = null;
+    paint();
+  }
+
+  function paint() {
+    var res = E.evaluate(game);
+    var gained = 0;
+    for (var i = 0; i < tiles.length; i++) {
+      var on = !!res.lit[i];
+      if (litPrev && !litPrev[i] && on) gained++;
+      tiles[i].classList.toggle('is-lit', on);
+    }
+    litPrev = res.lit;
+    return { res: res, gained: gained };
+  }
+
+  /* ── turning a strand ───────────────────────────────── */
+  function turn(i, dir) {
+    if (locked || !game) return;
+    game.rots[i] += dir;
+    moves++;
+    tiles[i].style.setProperty('--r', (game.rots[i] * 90) + 'deg');
+    tiles[i].classList.remove('is-hint');
+    $('hud-moves').textContent = moves;
+
+    buzz(9);
+    Sound.turn();
+
+    var out = paint();
+    if (out.gained > 0 && !out.res.solved) Sound.connect();
+    if (out.res.solved) win();
+  }
+
+  board.addEventListener('pointerdown', function (ev) {
+    var t = ev.target.closest ? ev.target.closest('.tile') : null;
+    if (!t) return;
+    ev.preventDefault();
+    Sound.unlock();
+    turn(+t.dataset.i, ev.button === 2 ? -1 : 1);
+  });
+  board.addEventListener('contextmenu', function (ev) { ev.preventDefault(); });
+
+  /* ── level lifecycle ────────────────────────────────── */
+  function start(level) {
+    game = E.build(level);
+    moves = 0; usedHint = 0; locked = false;
+    var ch = E.chapterOf(level);
+    $('hud-chapter').textContent = 'Chapter ' + ch.numeral + ' · ' + ch.name;
+    $('hud-level').textContent = 'Level ' + level;
+    $('hud-moves').textContent = '0';
+    $('hud-par').textContent = 'par ' + game.par;
+    $('hint-label').textContent = 'Hint';
+    $('btn-hint').disabled = false;
+    show('screen-game');
+    render();
+  }
+
+  function restart() {
+    if (!game) return;
+    game.rots = Int16Array.from(game.start);
+    moves = 0; usedHint = 0; locked = false;
+    $('hud-moves').textContent = '0';
+    $('btn-hint').disabled = false;
+    $('hint-label').textContent = 'Hint';
+    render();
+  }
+
+  function win() {
+    locked = true;
+    board.classList.add('is-solved');
+    buzz([12, 60, 26]);
+    Sound.win();
+
+    var lvl = game.level;
+    var stars = E.starsFor(moves, game.par, usedHint > 0);
+    var prevBest = S.best[lvl];
+    Store.recordWin(lvl, moves, stars);
+
+    $('win-title').textContent = stars === 3 ? 'Flawless' : 'Complete';
+    $('win-moves').textContent = moves;
+    $('win-par').textContent = game.par;
+    $('win-best').textContent = Math.min(moves, prevBest === undefined ? moves : prevBest);
+    $('win-stars').innerHTML = [0, 1, 2].map(function (k) {
+      return '<span class="' + (k < stars ? 'on' : '') + '">' + STAR + '</span>';
+    }).join('');
+
+    setTimeout(function () { veil('veil-win', true); }, S.settings.reducedMotion ? 200 : 900);
+  }
+
+  /* ── hint ───────────────────────────────────────────── */
+  function hint() {
+    if (locked || !game) return;
+    var i = E.findUnsolved(game);
+    if (i < 0) return;
+    usedHint++;
+    Sound.hint();
+    var t = tiles[i];
+    t.classList.remove('is-hint');
+    void t.offsetWidth;                    // restart the pulse
+    t.classList.add('is-hint');
+    if (usedHint >= 3) {
+      $('btn-hint').disabled = true;
+      $('hint-label').textContent = 'Spent';
+    } else {
+      $('hint-label').textContent = 'Hint · ' + (3 - usedHint);
+    }
+  }
+
+  /* ── title screen ───────────────────────────────────── */
+  function refreshTitle() {
+    var resuming = S.started && S.level > 1;
+    $('play-label').textContent = resuming ? 'Continue' : 'Begin';
+    $('btn-newgame').hidden = !resuming;
+    var meta = $('title-meta');
+    if (resuming) {
+      var ch = E.chapterOf(S.level);
+      meta.textContent = 'Chapter ' + ch.numeral + ' · Level ' + S.level;
+      meta.hidden = false;
+    } else {
+      meta.hidden = true;
+    }
+  }
+
+  /* ── wiring ─────────────────────────────────────────── */
+  function on(id, fn) { $(id).addEventListener('click', function (e) { Sound.unlock(); Sound.press(); fn(e); }); }
+
+  on('btn-play', function () {
+    S.started = true; Store.save();
+    start(S.level);
+  });
+  on('btn-newgame', function () {
+    Store.reset();
+    S = Store.state;
+    applySettings(); refreshTitle();
+  });
+  on('btn-how', function () { veil('veil-how', true); });
+  on('btn-how-close', function () { veil('veil-how', false); });
+  on('btn-settings', function () { veil('veil-settings', true); });
+  on('btn-settings-close', function () { veil('veil-settings', false); });
+
+  on('btn-home', function () { veil('veil-menu', true); });
+  on('btn-resume', function () { veil('veil-menu', false); });
+  on('btn-menu-restart', function () { veil('veil-menu', false); restart(); });
+  on('btn-menu-settings', function () { veil('veil-menu', false); veil('veil-settings', true); });
+  on('btn-menu-home', function () { veil('veil-menu', false); refreshTitle(); show('screen-title'); });
+
+  on('btn-restart', restart);
+  on('btn-hint', hint);
+
+  on('btn-next', function () {
+    veil('veil-win', false);
+    start(game.level + 1);
+  });
+  on('btn-replay', function () {
+    veil('veil-win', false);
+    restart();
+  });
+
+  $('seg-theme').addEventListener('click', function (ev) {
+    var b = ev.target.closest('button'); if (!b) return;
+    S.settings.theme = b.dataset.theme;
+    Store.save(); applySettings(); Sound.press();
+  });
+  $('set-sound').addEventListener('change', function (e) {
+    S.settings.sound = e.target.checked; Store.save(); applySettings();
+    if (e.target.checked) { Sound.unlock(); Sound.connect(); }
+  });
+  $('set-haptics').addEventListener('change', function (e) {
+    S.settings.haptics = e.target.checked; Store.save(); buzz(14);
+  });
+  $('set-motion').addEventListener('change', function (e) {
+    S.settings.reducedMotion = e.target.checked; Store.save(); applySettings();
+  });
+
+  doc.addEventListener('keydown', function (ev) {
+    if (ev.key === 'Escape') {
+      if (!$('veil-win').hidden) return;
+      if (!$('veil-settings').hidden) return veil('veil-settings', false);
+      if (!$('veil-how').hidden) return veil('veil-how', false);
+      if (!$('veil-menu').hidden) return veil('veil-menu', false);
+      if ($('screen-game').classList.contains('is-active')) veil('veil-menu', true);
+    }
+    if (ev.key === 'r' && $('screen-game').classList.contains('is-active')) restart();
+  });
+
+  root.addEventListener('resize', layout);
+  root.addEventListener('orientationchange', function () { setTimeout(layout, 120); });
+
+  applySettings();
+  refreshTitle();
+})(window, document);
+
+</script>
